@@ -1,6 +1,9 @@
-@import './base.css';
+@atailwind base;
+@atailwind components;
+@tailwind utilities;
 
-body {
+/* @import './base.css'; */
+/* body {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,4 +171,4 @@ code {
   .actions {
     display: none;
   }
-}
+} */
