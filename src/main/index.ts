@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { serverWistCero } from './helpers/wits0emulator'
+import { wistServer } from './helpers/wits0emulator'
 
 // import { ipcMain } from 'electron';
 
@@ -31,7 +31,7 @@ function createWindow(): void {
   //  }, 1000)
 
   // EventesData
-  serverWistCero(mainWindow)
+  wistServer.browserWindow = mainWindow
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -66,8 +66,12 @@ app.whenReady().then(() => {
   })
 
   // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.on('ping', () => {
+    console.log('pong')
+    wistServer.startServer()
+  })
   ipcMain.handle('pupa', async () => {
+    wistServer.turnOffServer()
     return 'pupa'
   })
 
