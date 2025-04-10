@@ -75,6 +75,7 @@ class WistServeClass {
     })
     this.server.listen(this.port, () => {
       console.log(`Servidor WITS0 activo en puerto ${this.port}`)
+      if (this.browserWindow) this.browserWindow.webContents.send('serverStatus', true)
     })
   }
   turnOffServer(): void {
@@ -88,6 +89,7 @@ class WistServeClass {
       console.log('Servidor detenido')
     })
 
+    if (this.browserWindow) this.browserWindow.webContents.send('serverStatus', false)
     this.server = null
   }
 }

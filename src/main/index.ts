@@ -70,6 +70,17 @@ app.whenReady().then(() => {
     console.log('pong')
     wistServer.startServer()
   })
+
+  ipcMain.on('serverOn', () => {
+    wistServer.startServer()
+  })
+
+  ipcMain.on('serverOff', () => {
+    wistServer.turnOffServer()
+  })
+
+
+
   ipcMain.handle('pupa', async () => {
     wistServer.turnOffServer()
     return 'pupa'
