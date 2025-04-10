@@ -1,43 +1,13 @@
-import Versions from './Versions'
-import { useEffect, useState } from 'react'
+import { useServerTabProps } from 'src/types/front.types'
+import Versions from '../components/Versions'
 
-function ServerTab(): JSX.Element {
-  const [valor, setValor] = useState<number | null>(null)
-  const [serverStatus, setserverStatus] = useState<boolean>(false)
-
-  useEffect(() => {
-    const listener = (_event: Electron.IpcRendererEvent, data: number): void => {
-      setValor(data)
-    }
-    window.electron.ipcRenderer.on('nuevo-dato', listener)
-    // Cleanup al desmontar
-    return (): void => {
-      window.electron.ipcRenderer.removeListener('nuevo-dato', listener)
-    }
-  }, [])
-
-  useEffect(() => {
-    const listener = (_event: Electron.IpcRendererEvent, serverStatus: boolean): void => {
-      setserverStatus(serverStatus)
-    }
-    window.electron.ipcRenderer.on('serverStatus', listener)
-    // Cleanup al desmontar
-    return (): void => {
-      window.electron.ipcRenderer.removeListener('serverStatus', listener)
-    }
-  }, [])
-
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-  const pupauHandle = async (): Promise<void> => {
-    const xd = await window.electron.ipcRenderer.invoke('pupa')
-    alert(xd)
-  }
-
-  const serverHandle = (): void => {
-    if (serverStatus) window.electron.ipcRenderer.send('serverOff')
-    else window.electron.ipcRenderer.send('serverOn')
-  }
-
+function ServerTab({
+  valor,
+  serverStatus,
+  ipcHandle,
+  pupauHandle,
+  serverHandle
+}: useServerTabProps): JSX.Element {
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">

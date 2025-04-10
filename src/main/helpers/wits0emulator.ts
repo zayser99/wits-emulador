@@ -1,12 +1,9 @@
 import { BrowserWindow } from 'electron'
-import net, { Socket } from 'net'
-interface client {
-  socket: Socket
-  interval: ReturnType<typeof setInterval>
-}
+import net from 'net'
+import { clientBackend, clientFront } from '../../types/front.types'
 
 class WistServeClass {
-  clients: Set<client>
+  clients: Set<clientBackend>
   browserWindow: BrowserWindow | null
   conectionIsActive: boolean
   port: number
@@ -20,13 +17,15 @@ class WistServeClass {
     this.port = port
     this.frecuency = frecuency
     this.server = null
-    this.clients = new Set<client>()
+    this.clients = new Set<clientBackend>()
   }
 
   startServer(): void {
     this.server = net.createServer((socket) => {
+      const id = crypto.randomUUID()
       let conunter: number = 0
       console.log('Cliente conectado:', socket.remoteAddress, socket.remotePort)
+
       const interval = setInterval(() => {
         const witsFrame = `
         &&
@@ -55,21 +54,31 @@ class WistServeClass {
         !!
         `
         socket.write(witsFrame) // Enviar como string normal
-        console.log(`mensaje #${conunter} Enviado`)
+        // console.log(`mensaje #${conunter} Enviado`)
         if (this.browserWindow) this.browserWindow.webContents.send('nuevo-dato', conunter)
         conunter++
       }, this.frecuency)
 
-      const cliente: client = { socket: socket, interval: interval }
+      const cliente: clientBackend = {
+        id: id,
+        socket: socket,
+        interval: interval,
+        ip: socket.remoteAddress ? socket.remoteAddress : '-',
+        remotePort: socket.remotePort ? socket.remotePort : '-',
+        ipType: socket.remoteFamily ? socket.remoteFamily : '-'
+      }
       this.clients.add(cliente)
+      this.#refreshClientsToFrontEnd()
 
       socket.on('end', () => {
         clearInterval(interval)
+        this.dropClient(id)
         console.log('Cliente desconectado')
       })
 
       socket.on('error', (err) => {
         clearInterval(interval)
+        this.#refreshClientsToFrontEnd()
         console.error('Error en el socket:', err)
       })
     })
@@ -91,6 +100,32 @@ class WistServeClass {
 
     if (this.browserWindow) this.browserWindow.webContents.send('serverStatus', false)
     this.server = null
+  }
+
+  dropClient(idToDelete: string): void {
+    for (const client of this.clients) {
+      if (client.id === idToDelete) {
+        client.socket.end()
+        client.socket.destroy()
+        clearInterval(client.interval)
+        this.clients.delete(client) // elimina por referencia
+        this.#refreshClientsToFrontEnd()
+      }
+    }
+  }
+
+  #refreshClientsToFrontEnd(): void {
+    const clientsLite: clientFront[] = []
+    for (const client of this.clients) {
+      const clientLite = {
+        id: client.id,
+        ip: client.ip,
+        remotePort: client.remotePort,
+        ipType: client.ipType
+      }
+      clientsLite.push(clientLite)
+    }
+    if (this.browserWindow) this.browserWindow.webContents.send('clientList', clientsLite)
   }
 }
 
