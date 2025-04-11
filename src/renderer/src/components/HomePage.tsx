@@ -4,9 +4,11 @@ import ServerTab from '../pages/ServerTab'
 import DataTab from '@renderer/pages/DataTab'
 import ClientsTab from '@renderer/pages/ClientsTab'
 import { useServerTab } from '@renderer/hooks/useServerTab'
+import { useClientsTab } from '@renderer/hooks/useClientsTab'
 
 function HomePage(): JSX.Element {
   const { valor, serverStatus, ipcHandle, pupauHandle, serverHandle } = useServerTab()
+  const { clients, deleteClientHandle } = useClientsTab()
 
   const tabs: tab[] = [
     { id: 'data', label: 'Data', content: <DataTab /> },
@@ -23,7 +25,11 @@ function HomePage(): JSX.Element {
         />
       )
     },
-    { id: 'clients', label: 'Clients', content: <ClientsTab /> }
+    {
+      id: 'clients',
+      label: 'Clients',
+      content: <ClientsTab clients={clients} deleteClientHandle={deleteClientHandle} />
+    }
   ]
 
   return <Tabs tabs={tabs} />

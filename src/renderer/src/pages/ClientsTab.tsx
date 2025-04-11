@@ -1,11 +1,6 @@
-import { useIpcListener } from '@renderer/hooks/useIpcListener'
-import { useState } from 'react'
-import { clientFront } from 'src/types/front.types'
+import { useClientsTabProps } from 'src/types/front.types'
 
-function ClientsTab(): JSX.Element {
-  const [clients, setClients] = useState<clientFront[]>([])
-  useIpcListener<clientFront[]>('clientList', setClients)
-
+function ClientsTab({ clients, deleteClientHandle }: useClientsTabProps): JSX.Element {
   return (
     <div className="relative overflow-x-auto rounded-2xl shadow-lg">
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 rounded-2xl">
@@ -39,9 +34,14 @@ function ClientsTab(): JSX.Element {
                 <td className="px-6 py-4">{client.remotePort}</td>
                 <td className="px-6 py-4">{client.ipType}</td>
                 <td className="px-6 py-4">
-                  <a href="#" className="font-medium text-red-600 hover:underline">
+                  <button
+                    onClick={() => {
+                      deleteClientHandle(client.id)
+                    }}
+                    className="font-medium text-red-600 hover:underline"
+                  >
                     Delete
-                  </a>
+                  </button>
                 </td>
               </tr>
             )

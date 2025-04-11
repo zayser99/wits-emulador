@@ -1,8 +1,11 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+
 import { wistServer } from './helpers/wits0emulator'
+import { registerIpcEvents } from './ipc/events'
+import { registerIpcHandlers } from './ipc/ handlers'
 
 // import { ipcMain } from 'electron';
 
@@ -65,27 +68,8 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => {
-    console.log('pong')
-    wistServer.startServer()
-  })
-
-  ipcMain.on('serverOn', () => {
-    wistServer.startServer()
-  })
-
-  ipcMain.on('serverOff', () => {
-    wistServer.turnOffServer()
-  })
-
-
-
-  ipcMain.handle('pupa', async () => {
-    wistServer.turnOffServer()
-    return 'pupa'
-  })
-
+  registerIpcEvents()
+  registerIpcHandlers()
   createWindow()
 
   app.on('activate', function () {

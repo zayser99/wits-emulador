@@ -99,7 +99,9 @@ class WistServeClass {
     })
 
     if (this.browserWindow) this.browserWindow.webContents.send('serverStatus', false)
+
     this.server = null
+    this.#dropAllClients()
   }
 
   dropClient(idToDelete: string): void {
@@ -126,6 +128,11 @@ class WistServeClass {
       clientsLite.push(clientLite)
     }
     if (this.browserWindow) this.browserWindow.webContents.send('clientList', clientsLite)
+  }
+
+  #dropAllClients(): void {
+    this.clients.clear()
+    if (this.browserWindow) this.browserWindow.webContents.send('clientList', [])
   }
 }
 

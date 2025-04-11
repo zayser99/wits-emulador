@@ -7,12 +7,18 @@ export interface tab {
   content: JSX.Element
 }
 
+//hooks types
 export interface useServerTabProps {
   valor: number | null
   serverStatus: boolean
   ipcHandle: () => void
   pupauHandle: () => Promise<void>
   serverHandle: () => void
+}
+
+export interface useClientsTabProps {
+  clients: clientFront[]
+  deleteClientHandle: (clientId: string) => void
 }
 
 export interface clientBackend {
