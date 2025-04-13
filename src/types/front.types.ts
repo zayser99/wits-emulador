@@ -31,3 +31,12 @@ export interface clientBackend {
 }
 
 export type clientFront = Omit<clientBackend, 'socket' | 'interval'>
+
+export interface witsElementFront {
+  active: boolean
+  mnemonic: string
+  witsCode: string
+  description: string
+  metrics: string
+  value: number | string
+}
